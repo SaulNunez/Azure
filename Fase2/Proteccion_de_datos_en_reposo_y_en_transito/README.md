@@ -166,3 +166,4 @@ Revisa que la base de datos no se haya modificado de manera externa.
 ### Azure Purview
 Lugar centralizado para administrar.
 * Clasificacion de confidencialidad
+* Ver a dónde estan viajando nuestros datos y cómo
