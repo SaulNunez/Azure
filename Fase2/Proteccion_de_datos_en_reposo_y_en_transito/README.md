@@ -90,7 +90,7 @@ SELECT *  FROM sys.sensitivity_classifications;
 ```
 
 ```sql
-ADD SENSITIVITY CLASSIFICIATION TO
+ADD SENSITIVITY CLASSIFICATION TO
     [Application].[People].[EmailAddress]
 WITH (LABEL="PII", INFORMATION_TYPE='Email');
 ```
