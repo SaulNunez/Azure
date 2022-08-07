@@ -34,6 +34,10 @@ Para administrar Firewall del servidor se usan las reglas.
 SELECT * FROM sys.firewall_rules
 ```
 
+```sql
+EXEC sp_set_database_firewall_rule N'allow all azure resources' '0.0.0.0', '0.0.0.0'
+```
+
 Regla 0.0.0.0 a 0.0.0.0 en contexto de azure es a todos los recursos en mi subcripción.
 
 ## Metodos de conexion privados
