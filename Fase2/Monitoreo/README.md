@@ -87,6 +87,180 @@ Contenedor para soliciturees de sesion.
 #### Función clasificadora
 Determina a cual carga de trabajo pertenece una consulta. 
 
+## 
+### Disk Based Rowstore
+Indices tradicionales utilizados principalmente para cargas OLTP. Muchas transacciones, inserta este dato, muchas pero pequeñas en unidad.
+
+* Clustered: Almacena fisicamente los datos de las tablas en ese orden.
+* Non-clustered: Crea un indice separado utilizando un arbol binaro haciendo referencia a los registros. 
+
+### Columnstore
+Indices principalmente para cargas OLAP. Agregado hace tiempo. Los divide entre un tamaño fijo de megabytes para crear grupos de renglones. 
+Utiles para funciones de agregación. OLAP cargas analíticas.
+
+### Memory optimized
+Indices utilizados en tablas almacenadas en memoria ram.
+* Hash: Divide en buckets lo datos
+* 
+
+## Reconstruir y reorganizar indices
+* Al insertar datos se crear fragmentacion
+* La fragmentacion es cuando el orden lógico no corresponde al orden físico
+* Si la fragmentacion es **entre 5% y 30%** es recomendable **reorganizar** el índice
+* Si es **mayor a 30%** es recomendable **reconstruir** el índice
+* Reconstruir el índice también actualiza las estadísticas
+* Tipos:
+    * Offline: Bloqueo mientras se reconstruye
+    * Online: Reconstruye en otros lado y cuando termina lo reemplaza
+
+46 minutos ish
+### Rowstore
+```sql
+-- Ge information about rowstore indexes in one table
+SELECT * FROM 
+sys.dm_db_index_physical_stats(
+    DB_ID('AdventureSource'),
+    OBJECT_ID('SalesLT.Customer'),
+    null,
+    DEFAULT,
+    DEFAULT
+)
+```
+En examen: `dm_db_index_physical_stats`
+
+### Columnstore
+```sql 
+SELECT i.object_id,
+
+```
+En examen: ``
+
+### Reconstruir
+```sql
+
+```
+
+SORT_IN_TEMP_DB = Si no cabe en memoria, entonces, usa tempdb en lugar de disco duro para reconstruirlo.
+
+### Reorganizar
+```
+
+```
+
+## Uso de estadisticas de SQL Server
+Paginas de 8 kilobytes. Almacenan distribucion de los datos, para calcular mas o menos cuantos datos regresaran.
+
+## Mantenimiento de índices y estadísticas en SQL Server
+Se puede automatizar con un agente de SQL Server.
+
+## Configuración de la base de datos
+Alter database
+* Database recovery model: Nos dice la manera en la que va a guardar el log de transacciones.
+    * Simple: Guarda un log sencillo de que se hizo.
+    * Full: Guarda que paso y todos los detalles.
+* Auto create and update statistics - Permite crear y actualizar estadisticas de forma asincrona
+* Snapshot isolation:
+
+Alter database scoped configuration
+* Maximun degree of parallelism
+* Legacy cardinality estimation
+* Last query plan stats: Determina si se almacenan estadisticas del último plan para cada query. Recomendado usar.
+* Optimize for Ad Hoc Workloads
+
+## Operadores de lectura
+* Table scan
+* Clustered index scan
+* NonClustered index scan
+* NonClustered index seek
+
+## Pasos de ejecucion
+[Ejercicio](./SQL%20Execution%20plans.sql)
+
+* Parse, arbol **sintactico** de la operación. Solo checa que tenga sentido, no que se pueda ejecutar, ej. tablas que no existen.
+* Bind, revisa **semanticamente** que nuestra query tenga sentido. Conecta objetos de nuestra query a elementos de nuestra base de datos. 
+* Optimize, buscar si hay planes simples que ya cumplan con esta query.
+    3. Verificacion de planes en cache
+    4. Creacion de plan de ejecucion basado en costo
+        * Optimizar query
+    5. Ejecución del plan
+
+## Statistics
+[Ejercicio](./Statistics%20-%20part%202.sql)
+
+Probablemente en examen:
+```sql
+SET STATISTICS IO ON;
+```
+Paginas de 8k leidas al ejecutar query.
+
+```sql
+SHOW PLAN ON;
+```
+Nos muestra el plan de ejecucion de la query. 
+
+```sql
+SET STATISTICS PROFILE ON;
+```
+
+Similar al anterior, pero tiene información de la ejecución real, como numero de filas regresadas.
+
+Estimated subtree cost: 
+Crea distintos planes de ejecucion si no tiene una forma sencilla de hacer operación.
+
+Cosas en cache:
+* Planes de ejecucion
+* Paginas de datos
+* Algunas veces, indices
+
+Covering index: 
+es un indice que contiene todas las columnas para una consulta.
+
+Sargability: 
+puede utilizar el indice dadas las formas que construimos el indice y usar seek.   
+
+Index scan:
+Lee desde el principio.   
+Index seek:
+Se pasa hasta que empiezen los valores que necesita.   
+Es mejor reescribir *query* para evitar usar funciones.
+Obtener statistics que SQL Server tiene para nuestra tabla:
+```sql
+SELECT so.name,
+    st.name,
+    st.stats_id,
+    sc.stats_column_id,
+    c.name as column_name,
+    st.auto_created,
+    st.filter_definition,
+    sp.last_updated,
+    sp.rows,
+    sp.rows_sampled,
+    sp.steps,
+    sp.modification_counter
+FROM sys.stats AS st
+JOIN sys.stats_columns AS sc on st.object_id=sc.object_id and st.stats_id=sc.stats_id
+JOIN sys.columns as c on sc.object_id=c.object_id and sc.column_id=c.column_id
+JOIN sys.objects as so on st.object_id=so.object_id
+CROSS APPLY sys.dm_db_stats_properties(st.object_id, st.stats_id) sp
+WHERE so.name='Posts'
+ORDER by so.name, st.stats_id, sc.stats_column_id;
+GO
+```
+
+
+## Kahoot
+Distributed transactions: Managed
+Diferential backups: Managed instance, 12 hours
+Backups: Azure site recovery
+Update in versions and compatibility versions: Maintains execution plan
+Create users permission: access admin
+What allows a user to use store procedure without being given permission to table: Ownership chaining
+Transparent data encryption: Master eky
+Database firewall: TSQL
+AFTER UPDATE TO VAlUES: Se chequea despues de la actualización
+View database size in Azure SQL: In resource provider
+Resource governor: Se puede limitar uso de recursos. Respuesta correcta test write IOPS.
+
 # Extra a la certificación
 ## Prometheus
 Heramienta de monitoreo/alertas:
