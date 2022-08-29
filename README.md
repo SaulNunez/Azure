@@ -33,3 +33,6 @@ Notas del curso Aprende: Microsoft Certified: Azure Database Administrator Assoc
 1. [Azure SQL](./Fase2/Azure%20SQL/)
 2. [Autenticación y autorización](./Fase2/Autenticacion_y_autorizacion/)
 3. [Protección de datos en reposo y en uso](/Fase2/Proteccion_de_datos_en_reposo_y_en_transito/)
+4. [Diseño basado en rendimiento](./Fase2/dise%C3%B1o_basado_en_rendimiento/)
+5. [Monitoreo](./Fase2/Monitoreo/)
+6. [Think like an engine](./Fase2/think_like_an_engine/)
