@@ -117,6 +117,9 @@ Nivel de efecto | Base de datos | Transacción
 Version recuperada | La mas reciente en TempDB | La mas reciente al incio de la transaccion en TempDB
 Operaciones | Lectura | Todas
 
+RSCI: Se recupera en lectura la última versión que este en TempDB y estos tienen bloqueos.
+Snapshot Isolation: Se puede configurar nivel en cada transacción.
+
 ## Parameter sniffing
 ### Soluciones
 #### Recompilar el query cada vez que se necesite
@@ -191,31 +194,66 @@ GO
 
 ```
 
+## Fenómenos de aislamiento
+* Dirty reads: Se leen renglones sin commit.
+* Non repeatable read: Dentro de una misma transacción si se ejecuta la misma query se obtienen datos distintos.
+* Phantom read: Dos transacciones distintas se ejecutan simultaneamente y reciben valores distintos.
 
-### DMVs
+## Isolation levels for transactions
+Isolation level | Dirty Read | Non-repeatable Read | Phantom
+--- | --- | --- | ---
+Read uncommited | ✅ Yes | ✅ Yes | ✅ Yes 
+Read commited | 👎No  | ✅ Yes | ✅ Yes
+Repeatable read | 👎No | 👎No | ✅ Yes
+Snapshot | 👎No | 👎No | 👎No
+Serializable | 👎No | 👎No | 👎No
+
+## Intelligent Query Processing
+![Intelligent Query Processing support by version](https://docs.microsoft.com/en-us/sql/relational-databases/performance/media/iqp-feature-family.svg?view=sql-server-ver16)
+
+* Adaptative Query Processing fue introducido en SQL Server 2017, nivel de compatibilidad = 140.
+* Intelligent Query Processing en SQL Server 2019, nivel de compatibilidad = 150.
+
+### Operaciones de SQL Server 2017
+* Batch mode: Dependiendo número de renglones eligira que operación utilizara para hacer el join.
+* Interleaved execution: Mejora rendimiento en `multi-statement table-valued functions`. Calcula de mejor manera renglones regresados, la primera vez que se ejecuta calcula renglones y se queda estimación.
+* Memory Grant Feedback: Si SQL Server estima menos renglones para una query especifica, cada vez que se ejecute la query se le estara asignando un poco mas memoria para evitar sacar información a TempDB.
+
+### Operaciones de SQL Server 2019
+* Table Variable Deferred Compilation: Similar a `multi-statement table-valued functions`. Se pueden insertar información siempre que empate con estructura definida al inicio.
+* Batch mode on row store: Hay operaciones que se hacen de manera paralela. 
+* T-SQL Scalar UDF Inlining: Funciones escalares del usuario que se hacian cada renglon se paralelizan.
+* Approximate Count Distinct: Algunos algoritmos que mejoran el margen de error al 2-5% para este tipo de operaciones. 
+
+## Dynamic Management View
+
 DMV | Uso
 --- | ---
-sys.dm_exec_cached_plans | Planes de ejecución en cache, planes estimados
-sys.dm_exec_sessions | Sesiones en SQL Server
-sys.dm_exec_connections | Conexiones en SQL Server
-sys.dm_index_usage_states | Seeks, scans y lookups por indices
-sys.dm_io_virtual_file_stats | Estadisticas de escritura y lectura
-sys.dm_tran_active_transactions | Estados de las transacciones en el servidor
-sys.dm_exec_sql_text | Texto T-SQL de consultas (Función)
-sys.dm_exec_query_plan | Plan de ejecución XML (Función)
-sys.dm_os_performance_counters | Contadores relacionados con SQL Server
-sys.dm_resource_stat | Información de recursos en Azure SQL Database
+`sys.dm_exec_cached_plans` | Planes de ejecución en cache, planes estimados
+`sys.dm_exec_sessions` | Sesiones en SQL Server
+`sys.dm_exec_connections` | Conexiones en SQL Server
+`sys.dm_index_usage_states` | Seeks, scans y lookups por indices
+`sys.dm_io_virtual_file_stats` | Estadisticas de escritura y lectura
+`sys.dm_tran_active_transactions` | Estados de las transacciones en el servidor
+`sys.dm_exec_sql_text` | Texto T-SQL de consultas (Función)
+`sys.dm_exec_query_plan` | Plan de ejecución XML (Función)
+`sys.dm_os_performance_counters` | Contadores relacionados con SQL Server
+`sys.dm_resource_stat` | Información de recursos en Azure SQL Database
+
+### Permisos
+* `VIEW SERVER STATE`
+* `VIEW DATABASE STATE`
 
 
 ## Tipos de espera
 Tipos | Descripción
 --- | ---
-RESOURCE_SEMAPHORE | Indica que la query está esperando a que se le asigne memoria para poder ejecutarse
-LCK_M_X y LCK* | Indican que están esperando debido a bloqueos en los recursos que van a utilizar
-PAGEIOLATCH_SH | Indica esperas para los procesos de lectura y escritura. Numero de ocurrencias bajo y duracion de ocurrencias altas: Problemas en dispositivo almacenamiento. Numero de ocurrencias alto y duracion de ocurrencias bajo: Muchas operaciones scan
-SOS_SCHEDULER_YIELD | Indica alto uso de CPU
-CX_PACKET | Indica uso de paralelismo en las queries.    Si el numero demasiado alto o el limite de costo para el uso de paralemismo es muy bajo es probable que queries simples son paralelizasas lo que reduce la concurrencia.
-PAGEIOLATCH_UP | Indica problemas de lectura y escritura asociadas con las queries.   En versiones <2017 significa problemas de contención en TempDB.   Hoy en dia significa problemas de almacenamiento
+`RESOURCE_SEMAPHORE` | Indica que la query está esperando a que se le asigne memoria para poder ejecutarse
+`LCK_M_X y LCK*` | Indican que están esperando debido a bloqueos en los recursos que van a utilizar
+`PAGEIOLATCH_SH` | Indica esperas para los procesos de lectura y escritura. Numero de ocurrencias bajo y duracion de ocurrencias altas: Problemas en dispositivo almacenamiento. Numero de ocurrencias alto y duracion de ocurrencias bajo: Muchas operaciones scan
+`SOS_SCHEDULER_YIELD` | Indica alto uso de CPU
+`CX_PACKET` | Indica uso de paralelismo en las queries.    Si el numero demasiado alto o el limite de costo para el uso de paralemismo es muy bajo es probable que queries simples son paralelizasas lo que reduce la concurrencia.
+`PAGEIOLATCH_UP` | Indica problemas de lectura y escritura asociadas con las queries.   En versiones <2017 significa problemas de contención en TempDB.   Hoy en dia significa problemas de almacenamiento
 
 ## Kahoot
 * Seek es solo mejor que scan cuando hay pocos renglones.
