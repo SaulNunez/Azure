@@ -1,5 +1,8 @@
 # Repaso de query store y query tuning
 
+## Table Scan
+No tenemos ordenada la información de ninguna manera.
+
 ## Clustered Index Scan
 La informacion esta ordenada de alguna forma, lee algunas columnas, pero no lee todos los renglon.
 
