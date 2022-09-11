@@ -39,3 +39,4 @@ Notas del curso Aprende: Microsoft Certified: Azure Database Administrator Assoc
 7. [Query Store](./Fase2/query_store/)
 8. [Query Tuning](./Fase2/query_tuning/)
 9. [Repaso](./Fase2/repaso/)
+10. [Automatización](./Fase2/automatizacion/)
