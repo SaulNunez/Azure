@@ -40,3 +40,5 @@ Notas del curso Aprende: Microsoft Certified: Azure Database Administrator Assoc
 8. [Query Tuning](./Fase2/query_tuning/)
 9. [Repaso](./Fase2/repaso/)
 10. [Automatización](./Fase2/automatizacion/)
+11. [Corrupción de datos](./Fase2/corrupcion_de_datos/)
+12. [SQL Server Agent](./Fase2/sql_server_agent/)
