@@ -42,3 +42,8 @@ Notas del curso Aprende: Microsoft Certified: Azure Database Administrator Assoc
 10. [Automatización](./Fase2/automatizacion/)
 11. [Corrupción de datos](./Fase2/corrupcion_de_datos/)
 12. [SQL Server Agent](./Fase2/sql_server_agent/)
+13. [HADR](./Fase2/HADR/)
+14. [FCI Considerations](./Fase2/fci_considerations/)
+15. [Compresion de datos](./Fase2/compresion_de_datos/)
+16. [Backups](./Fase2/backups/)
+16. [Repaso fin del curso](./Fase2/fin_curso/)
