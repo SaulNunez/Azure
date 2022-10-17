@@ -36,8 +36,14 @@ Todos los recursos de la instancia se transladan al nuevo nodo, por lo que una v
 
 Primera instancia es normal, la segunda se configurar como un Failover instance.
 
+[Mas información aquí](../fci_considerations/)
+
 #### Razones para usar
-FCI es una solución de HA principalmente:
+Es una solucion de HA:
+* En caso de requerir actualizaciones
+* Incidentes pantallazo azul
+* Mantenimiento planeado del servidor
+* Problemas no planeados de hardware
 
 
 #### Single point of failure
@@ -67,45 +73,6 @@ Los backups estan en un almacenamiento compartido.
 Dos instancias, que se comunicaban por la red. Tenia ventajas similares al grupo de disponibilidad.
 
 Se dejo de usar porque Windows Failover Cluster fue una solución mas robusta a lo largo del tiempo.
-
-### Configuracion de red
-
-### Configuracion de almacenamiento
-Para cada disco en cada maquina virtual hay que crear un nuevo volumen y formatearlo.
-Se sujiere etiquetar cada 
-
-#### Azure Shared Disks
-#### Storage Spaces Direct
-
-#### Testeo cluster
-```powershell
-# -Name             Nombre    
-# Lista de nodos
-# -StaticAddress    IP secundaria creada anteriormente
-New-Cluster -Name MyWSFC -Node Node1,Node2,...,NodeN -StaticAddress w.x.y.z
-```
-### Creación de witness
-### Shared Disk Witness
-
-### Configuración del DTC
-Una vez configurado el cluster debemos crear un Distributed Transaction Coordinator.
-Este DTC debe tener su propia IP y su propio disco compartido.
-
-
-## Always On Availability Group
-Cada instancia de SQL Server es independiente. La base de datos principal envia logs de transacciones y las replicas los restaura de forma sincrona o asincrona.
-Nota: Es posible combinarlo con FCI.
-
-### Razones de uso
-* Nos protege de corrupcion de base de datos por lo que puede ayudar a disaster recovery.   
-* Pero es normalmente usado para high availability.
-
-### Creación del listener
-Listener: Una vez habilitada la opcion de AG en SQL server se tendra que crear un listener, que estara conectado a un ILB con un probe port.
-
-```powershell
-Get-ClusterResource IPAdressReousreceNameForListener
-```
 
 
 ## HADR in Azure VMs
