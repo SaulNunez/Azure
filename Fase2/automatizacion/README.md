@@ -22,7 +22,10 @@ Todo lo del repositorio se puede desplegar automaticamente.
 * Solución más rápida de problemas
 * Experiencia continua de mejora del producto para los usuarios
 
-## Fases de Continuous Deployment
+#### Requisitos
+* Alta calidad de los tests
+* Commits o merge continuos
+
 
 ## Opciones de despliegue
 * AZ Powershell
