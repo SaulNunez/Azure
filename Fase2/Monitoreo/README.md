@@ -20,8 +20,7 @@ Categorias de espera
 * Signal wait: Estaba esperando el CPU, un hueco para poder hacer su trabajo.
 
 Vistas para visualizar valores
-* `sys.dm_os_`
-* `sys.`
+* `sys.dm_os_wait_stats`
 
 ## Eventos extendidos
 Canales principales
@@ -101,7 +100,7 @@ Utiles para funciones de agregación. OLAP cargas analíticas.
 ### Memory optimized
 Indices utilizados en tablas almacenadas en memoria ram.
 * Hash: Divide en buckets lo datos
-* 
+* Non-clustered: Crea un indice separado usando un arbol binario haciendo referencia a los registros.
 
 ## Reconstruir y reorganizar indices
 * Al insertar datos se crear fragmentacion
